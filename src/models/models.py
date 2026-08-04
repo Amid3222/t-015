@@ -8,50 +8,49 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
+
 from config import omegaconfig as conf
 
 
 def get_models():
-    models = {
-        'logistic_regression': LogisticRegression,
-        'decision_tree': DecisionTreeClassifier,
-        'random_forest': RandomForestClassifier,
-        'gradient_boosting': GradientBoostingClassifier,
-        'knn': KNeighborsClassifier,
-        'svc': SVC,
-        'xgboost': XGBClassifier,
-        'lightgbm': LGBMClassifier,
-        'catboost': CatBoostClassifier,
+    m = conf.get_param_conf().models
+
+    return {
+        "logistic_regression+baseline": LogisticRegression(**m.logistic_regression.versions.baseline),
+        "logistic_regression+l2": LogisticRegression(**m.logistic_regression.versions.l2),
+        "logistic_regression+l1": LogisticRegression(**m.logistic_regression.versions.l1),
+        "logistic_regression+elasticnet": LogisticRegression(**m.logistic_regression.versions.elasticnet),
+
+        "knn+default": KNeighborsClassifier(**m.knn.versions.default),
+
+        "decision_tree+default": DecisionTreeClassifier(**m.decision_tree.versions.default),
+
+        "random_forest+best": RandomForestClassifier(**m.random_forest.versions.best),
+
+        "catboost+default": CatBoostClassifier(**m.catboost.versions.default),
+
+        "xgboost+best": XGBClassifier(**m.xgboost.versions.best),
+
+        "lightgbm+default": LGBMClassifier(**m.lightgbm.versions.default),
+
+        "stacking+default": StackingClassifier(
+            estimators=[
+                ("knn", KNeighborsClassifier(**m.stacking.versions.default.base_models.knn)),
+                ("svc", SVC(**m.stacking.versions.default.base_models.svc)),
+                ("tree", DecisionTreeClassifier(**m.stacking.versions.default.base_models.tree)),
+            ],
+            final_estimator=LogisticRegression(),
+            cv=m.stacking.versions.default.cv,
+        ),
+
+        "voting+default": VotingClassifier(
+            estimators=[
+                ("logistic_regression", LogisticRegression()),
+                ("knn", KNeighborsClassifier()),
+                ("svc", SVC(probability=True)),
+            ],
+            voting=m.voting.versions.default.voting,
+        ),
     }
-    return models
 
 
-def get_ensembles_obj():
-    stacking_cfg = conf.get_param_conf().models.stacking.versions.default
-    voting_cfg = conf.get_param_conf().models.voting.versions.default
-
-    base_estimators = [
-        ('knn', KNeighborsClassifier(**dict(stacking_cfg.base_models.knn))),
-        ('svc', SVC(**dict(stacking_cfg.base_models.svc))),
-        ('tree', DecisionTreeClassifier(**dict(stacking_cfg.base_models.tree)))
-    ]
-
-    meta_model = LogisticRegression()
-
-    stack = StackingClassifier(
-        estimators=base_estimators,
-        final_estimator=meta_model,
-        cv=stacking_cfg.cv,
-        stack_method='auto',
-        n_jobs=-1
-    )
-
-    voting = VotingClassifier(
-        estimators=base_estimators.copy(),
-        voting=voting_cfg.voting,
-        weights=None,
-        n_jobs=-1
-    )
-
-    models = {"stack": stack, "voting": voting}
-    return models

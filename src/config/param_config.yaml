@@ -1,5 +1,3 @@
-# Конфигурация моделей и их версий гиперпараметров
-
 models:
 
   logistic_regression:
@@ -31,13 +29,17 @@ models:
     versions:
 
       default:
-        n_neighbors: null
+        n_neighbors: 5
         weights: uniform
         algorithm: auto
 
   decision_tree:
     versions:
-      gridsearch:
+      default:
+        max_depth: 5
+        min_samples_split: 2
+        min_samples_leaf: 1
+        random_state: 42
 
   random_forest:
     versions:
@@ -61,6 +63,13 @@ models:
   xgboost:
     versions:
       best:
+        n_estimators: 300
+        max_depth: 6
+        learning_rate: 0.05
+        subsample: 0.9
+        colsample_bytree: 0.9
+        random_state: 42
+        n_jobs: -1
 
   lightgbm:
     versions:
@@ -70,15 +79,6 @@ models:
         learning_rate: 0.04
         n_estimators: 250
         n_jobs: -1
-
-  #dnn:
-    #versions:
-      #default:
-        #hidden_size: 50
-        #learning_rate: 0.001
-        #epochs: 120
-        #batch_size: 32
-
 
   stacking:
     versions:
@@ -94,7 +94,6 @@ models:
             min_samples_leaf: 5
         meta_model: logistic_regression
         cv: 5
-
 
   voting:
     versions:

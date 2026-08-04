@@ -20,9 +20,38 @@ class Validater:
             X_train, X_val = X.iloc[train_idx], X.iloc[val_idx]
             y_train, y_val = y.iloc[train_idx], y.iloc[val_idx]
 
-            model = clone(model)
+            f_model = clone(model)
 
-            model.fit(X_train, y_train)
+            f_model.fit(X_train, y_train)
+
+            score = f_model.score(X_val, y_val)  # accuracy по умолчанию
+            scores.append(score)
+            print(f"Fold {fold + 1}: {score:.4f}")
+
+            if score > best_score:
+                best_score = score
+                best_model = f_model
+
+        print(f"\nСредний score: {np.mean(scores):.4f} ± {np.std(scores):.4f}")
+        return scores, best_model
+
+    def k_fold_catboost(self, dataframe, model_params, model_class, cat_features=None, kf=utils.get_skf()):
+        X, y = utils.split_data_pd(dataframe, conf.get_global_conf().params.target_column_name)
+        scores = []
+        best_score = 0
+        best_model = None
+
+        for fold, (train_idx, val_idx) in enumerate(kf.split(X)):
+            X_train, X_val = X.iloc[train_idx], X.iloc[val_idx]
+            y_train, y_val = y.iloc[train_idx], y.iloc[val_idx]
+
+            train_pool = Pool(X_train, y_train, cat_features=cat_features)
+            val_pool = Pool(X_val, y_val, cat_features=cat_features)
+
+            modelc = model_class
+            model = modelc(**model_params)
+
+            model.fit(train_pool, eval_set=val_pool, early_stopping_rounds=50)
 
             score = model.score(X_val, y_val)  # accuracy по умолчанию
             scores.append(score)
@@ -35,63 +64,13 @@ class Validater:
         print(f"\nСредний score: {np.mean(scores):.4f} ± {np.std(scores):.4f}")
         return scores, best_model
 
-    """
-    def k_fold_validate(self, dataframe, model_params, model_class, cat_features=None, kf=utils.get_skf()):
-        X, y = utils.split_data_pd(dataframe, conf.get_global_conf().params.target_column_name)
-        scores = []
-        best_score = 0
-        best_model = None
 
-        if model_class == CatBoostClassifier:
-            for fold, (train_idx, val_idx) in enumerate(kf.split(X)):
-                X_train, X_val = X.iloc[train_idx], X.iloc[val_idx]
-                y_train, y_val = y.iloc[train_idx], y.iloc[val_idx]
+def test_train_split_val(self, val_data_x, val_data_y, model):
+    y_preds = model.predict(val_data_x)
+    return utils.accuracy(y_preds, val_data_y)
 
-                train_pool = Pool(X_train, y_train, cat_features=cat_features)
-                val_pool = Pool(X_val, y_val, cat_features=cat_features)
 
-                modelc = model_class
-                model = modelc(**model_params)
-
-                model.fit(train_pool, eval_set=val_pool, early_stopping_rounds=50)
-
-                score = model.score(X_val, y_val)  # accuracy по умолчанию
-                scores.append(score)
-                print(f"Fold {fold + 1}: {score:.4f}")
-
-                if score > best_score:
-                    best_score = score
-                    best_model = model
-
-            print(f"\nСредний score: {np.mean(scores):.4f} ± {np.std(scores):.4f}")
-            return scores, best_model
-        else:
-            for fold, (train_idx, val_idx) in enumerate(kf.split(X)):
-                X_train, X_val = X.iloc[train_idx], X.iloc[val_idx]
-                y_train, y_val = y.iloc[train_idx], y.iloc[val_idx]
-
-                modelc = model_class
-                model = modelc(**model_params)
-
-                model.fit(X_train, y_train)
-
-                score = model.score(X_val, y_val)  # accuracy по умолчанию
-                scores.append(score)
-                print(f"Fold {fold + 1}: {score:.4f}")
-
-                if score > best_score:
-                    best_score = score
-                    best_model = model
-
-            print(f"\nСредний score: {np.mean(scores):.4f} ± {np.std(scores):.4f}")
-            return scores, best_model
-"""
-
-    def test_train_split_val(self, val_data_x, val_data_y, model):
-        y_preds = model.predict(val_data_x)
-        return utils.accuracy(y_preds, val_data_y)
-
-    def create_model(self, model_class, model_params):
-        modelc = model_class
-        model = modelc(**model_params)
-        return model
+def create_model(self, model_class, model_params):
+    modelc = model_class
+    model = modelc(**model_params)
+    return model
