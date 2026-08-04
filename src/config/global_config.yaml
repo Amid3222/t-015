@@ -4,6 +4,7 @@ params:
   random_state: 42
   path_to_data: None
   target_column_name: "Survived"
-  save_result_to: None
+  save_result_to: "/res"
   use_all_dataframes: True # использовать ли все версии датафреймов при трейне
   use_dataframe: None # при None выбирается по умолчанию
+  feat_ver : 0   #[0, 1] версии датасетов с разными фичами

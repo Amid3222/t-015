@@ -60,7 +60,7 @@ models:
 
   xgboost:
     versions:
-      gridsearch:
+      best:
 
   lightgbm:
     versions:
@@ -71,13 +71,13 @@ models:
         n_estimators: 250
         n_jobs: -1
 
-  dnn:
-    versions:
-      default:
-        hidden_size: 50
-        learning_rate: 0.001
-        epochs: 120
-        batch_size: 32
+  #dnn:
+    #versions:
+      #default:
+        #hidden_size: 50
+        #learning_rate: 0.001
+        #epochs: 120
+        #batch_size: 32
 
 
   stacking:

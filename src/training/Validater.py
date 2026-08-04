@@ -1,3 +1,6 @@
+from copy import deepcopy
+
+from sklearn.base import clone
 from sklearn.model_selection import KFold
 from catboost import CatBoostClassifier, Pool
 import numpy as np
@@ -7,9 +10,37 @@ from config import omegaconfig as conf
 
 class Validater:
 
+    def k_fold(self, dataframe, model, kf=utils.get_skf()):
+        X, y = utils.split_data_pd(dataframe, conf.get_global_conf().params.target_column_name)
+        scores = []
+        best_score = 0
+        best_model = None
+
+        for fold, (train_idx, val_idx) in enumerate(kf.split(X)):
+            X_train, X_val = X.iloc[train_idx], X.iloc[val_idx]
+            y_train, y_val = y.iloc[train_idx], y.iloc[val_idx]
+
+            model = clone(model)
+
+            model.fit(X_train, y_train)
+
+            score = model.score(X_val, y_val)  # accuracy по умолчанию
+            scores.append(score)
+            print(f"Fold {fold + 1}: {score:.4f}")
+
+            if score > best_score:
+                best_score = score
+                best_model = model
+
+        print(f"\nСредний score: {np.mean(scores):.4f} ± {np.std(scores):.4f}")
+        return scores, best_model
+
+    """
     def k_fold_validate(self, dataframe, model_params, model_class, cat_features=None, kf=utils.get_skf()):
         X, y = utils.split_data_pd(dataframe, conf.get_global_conf().params.target_column_name)
         scores = []
+        best_score = 0
+        best_model = None
 
         if model_class == CatBoostClassifier:
             for fold, (train_idx, val_idx) in enumerate(kf.split(X)):
@@ -28,20 +59,37 @@ class Validater:
                 scores.append(score)
                 print(f"Fold {fold + 1}: {score:.4f}")
 
+                if score > best_score:
+                    best_score = score
+                    best_model = model
+
             print(f"\nСредний score: {np.mean(scores):.4f} ± {np.std(scores):.4f}")
-            return scores
+            return scores, best_model
         else:
-            modelc = model_class
-            model = modelc(**model_params)
-            scores = utils.validate(model,
-                                    utils.split_data_np(dataframe, conf.get_global_conf().params.target_column_name))
+            for fold, (train_idx, val_idx) in enumerate(kf.split(X)):
+                X_train, X_val = X.iloc[train_idx], X.iloc[val_idx]
+                y_train, y_val = y.iloc[train_idx], y.iloc[val_idx]
+
+                modelc = model_class
+                model = modelc(**model_params)
+
+                model.fit(X_train, y_train)
+
+                score = model.score(X_val, y_val)  # accuracy по умолчанию
+                scores.append(score)
+                print(f"Fold {fold + 1}: {score:.4f}")
+
+                if score > best_score:
+                    best_score = score
+                    best_model = model
+
             print(f"\nСредний score: {np.mean(scores):.4f} ± {np.std(scores):.4f}")
-            return scores
+            return scores, best_model
+"""
 
     def test_train_split_val(self, val_data_x, val_data_y, model):
         y_preds = model.predict(val_data_x)
         return utils.accuracy(y_preds, val_data_y)
-
 
     def create_model(self, model_class, model_params):
         modelc = model_class
