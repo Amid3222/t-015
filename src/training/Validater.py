@@ -29,3 +29,21 @@ class Validater:
                 print(f"Fold {fold + 1}: {score:.4f}")
 
             print(f"\nСредний score: {np.mean(scores):.4f} ± {np.std(scores):.4f}")
+            return scores
+        else:
+            modelc = model_class
+            model = modelc(**model_params)
+            scores = utils.validate(model,
+                                    utils.split_data_np(dataframe, conf.get_global_conf().params.target_column_name))
+            print(f"\nСредний score: {np.mean(scores):.4f} ± {np.std(scores):.4f}")
+            return scores
+
+    def test_train_split_val(self, val_data_x, val_data_y, model):
+        y_preds = model.predict(val_data_x)
+        return utils.accuracy(y_preds, val_data_y)
+
+
+    def create_model(self, model_class, model_params):
+        modelc = model_class
+        model = modelc(**model_params)
+        return model
