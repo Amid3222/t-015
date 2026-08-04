@@ -1,0 +1,106 @@
+# Конфигурация моделей и их версий гиперпараметров
+
+models:
+
+  logistic_regression:
+    versions:
+
+      baseline:
+        max_iter: 1000
+
+      l2:
+        penalty: l2
+        C: 0.1
+        max_iter: 100
+        solver: lbfgs
+
+      l1:
+        penalty: l1
+        C: 1.0
+        solver: saga
+        max_iter: 1000
+
+      elasticnet:
+        penalty: elasticnet
+        C: 1.0
+        l1_ratio: 0.5
+        solver: saga
+        max_iter: 1000
+
+  knn:
+    versions:
+
+      default:
+        n_neighbors: null
+        weights: uniform
+        algorithm: auto
+
+  decision_tree:
+    versions:
+      gridsearch:
+
+  random_forest:
+    versions:
+      best:
+        n_estimators: 350
+        max_depth: 7
+        max_samples: 0.9
+        min_samples_split: 2
+        max_features: 7
+        random_state: 42
+        n_jobs: -1
+
+  catboost:
+    versions:
+      default:
+        iterations: 250
+        learning_rate: 0.073
+        depth: 3
+        l2_leaf_reg: 5
+
+  xgboost:
+    versions:
+      gridsearch:
+
+  lightgbm:
+    versions:
+      default:
+        num_leaves: 5
+        min_data_in_leaf: 25
+        learning_rate: 0.04
+        n_estimators: 250
+        n_jobs: -1
+
+  dnn:
+    versions:
+      default:
+        hidden_size: 50
+        learning_rate: 0.001
+        epochs: 120
+        batch_size: 32
+
+
+  stacking:
+    versions:
+      default:
+        base_models:
+          knn:
+            n_neighbors: 10
+          svc:
+            probability: true
+          tree:
+            max_depth: 5
+            random_state: 42
+            min_samples_leaf: 5
+        meta_model: logistic_regression
+        cv: 5
+
+
+  voting:
+    versions:
+      default:
+        estimators:
+          - logistic_regression
+          - knn
+          - svc
+        voting: soft
