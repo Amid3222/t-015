@@ -12,12 +12,23 @@ def validate(model, X, y):
 
 def save_results_csv(path_f=None, **kwargs):
     if path_f is None:
-
         path_f = conf.get_global_conf().params.save_result_to
     print(f"saving... {kwargs}")
     new_data = kwargs
     df_new = pd.DataFrame([new_data])
     df_new.to_csv(path_f, mode='a', header=False, index=False)
+
+
+def fillnas(X_train: pd.DataFrame, X_val: pd.DataFrame, columns):
+    fill_dict = {}
+
+    for col in columns:
+        fill_dict[col] = X_train[col].median(skipna=True)
+
+    X_train.fillna(fill_dict, inplace=True)
+    X_val.fillna(fill_dict, inplace=True)
+
+    return X_val, X_train
 
 
 def test_train_split(X, y):

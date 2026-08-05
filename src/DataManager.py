@@ -58,5 +58,13 @@ class DataManager:
         print(self.original_df.describe())
         print(self.original_df.isnull().sum(axis=0))
 
-    def fillnas(self, X: pd.DataFrame, y: pd.DataFrame, column):
-        pass
+    def fillnas(self, X_train: pd.DataFrame, X_val: pd.DataFrame, columns):
+        fill_dict = {}
+
+        for col in columns:
+            fill_dict[col] = X_train[col].median(skipna=True)
+
+        X_train.fillna(fill_dict, inplace=True)
+        X_val.fillna(fill_dict, inplace=True)
+
+        return X_val, X_train

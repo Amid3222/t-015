@@ -17,8 +17,12 @@ class Validater:
         best_model = None
 
         for fold, (train_idx, val_idx) in enumerate(kf.split(X, y)):
-            X_train, X_val = X.iloc[train_idx], X.iloc[val_idx]
-            y_train, y_val = y.iloc[train_idx], y.iloc[val_idx]
+            X_train = X.iloc[train_idx].copy()
+            X_val = X.iloc[val_idx].copy()
+            y_train = y.iloc[train_idx].copy()
+            y_val = y.iloc[val_idx].copy()
+
+            X_val, X_train = utils.fillnas(X_train, X_val, columns=["Age"])
 
             f_model = clone(model)
 
@@ -43,8 +47,12 @@ class Validater:
         best_model = None
 
         for fold, (train_idx, val_idx) in enumerate(kf.split(X, y)):
-            X_train, X_val = X.iloc[train_idx], X.iloc[val_idx]
-            y_train, y_val = y.iloc[train_idx], y.iloc[val_idx]
+            X_train = X.iloc[train_idx].copy()
+            X_val = X.iloc[val_idx].copy()
+            y_train = y.iloc[train_idx].copy()
+            y_val = y.iloc[val_idx].copy()
+
+            X_val, X_train = utils.fillnas(X_train, X_val, columns=["Age"])
 
             train_pool = Pool(X_train, y_train, cat_features=cat_features)
             val_pool = Pool(X_val, y_val, cat_features=cat_features)

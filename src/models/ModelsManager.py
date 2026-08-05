@@ -20,14 +20,7 @@ class ModelsManager:
             yield from [(model, model_name)]
 
         for model_name, model in self.model_reg.items():
-            if model_name in ["catboost+default"]:
-                yield model, model_name
-
-            pipeline = Pipeline([
-                ('imputer', SimpleImputer(strategy='median')),
-                ('classifier', model)
-            ])
-            yield pipeline, model_name
+            yield model, model_name
 
     def get_model_by_name(self, name: str):
         return self.model_reg[name]
