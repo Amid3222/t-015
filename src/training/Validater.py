@@ -65,9 +65,9 @@ class Validater:
         return scores, best_model
 
 
-def test_train_split_val(self, val_data_x, val_data_y, model):
-    y_preds = model.predict(val_data_x)
-    return utils.accuracy(y_preds, val_data_y)
+    def test_train_split_val(self, val_data_x, val_data_y, model):
+        y_preds = model.predict(val_data_x)
+        return utils.accuracy(y_preds, val_data_y)
 
 
 def create_model(self, model_class, model_params):

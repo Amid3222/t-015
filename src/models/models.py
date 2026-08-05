@@ -1,3 +1,5 @@
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
 from catboost import CatBoostClassifier
@@ -18,7 +20,10 @@ def get_models():
     return {
         "logistic_regression+baseline": LogisticRegression(**m.logistic_regression.versions.baseline),
         "logistic_regression+l2": LogisticRegression(**m.logistic_regression.versions.l2),
-        "logistic_regression+l1": LogisticRegression(**m.logistic_regression.versions.l1),
+        "logistic_regression+l1": Pipeline([
+            ('scaler', StandardScaler()),
+            ('model', LogisticRegression(**m.logistic_regression.versions.l1)),
+        ]),
         "logistic_regression+elasticnet": LogisticRegression(**m.logistic_regression.versions.elasticnet),
 
         "knn+default": KNeighborsClassifier(**m.knn.versions.default),
@@ -52,5 +57,3 @@ def get_models():
             voting=m.voting.versions.default.voting,
         ),
     }
-
-
