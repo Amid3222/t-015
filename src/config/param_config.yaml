@@ -9,7 +9,7 @@ models:
       l2:
         penalty: l2
         C: 0.1
-        max_iter: 100
+        max_iter: 300
         solver: lbfgs
 
       l1:

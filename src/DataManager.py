@@ -1,15 +1,22 @@
+from pathlib import Path
+
 from config import omegaconfig as conf
 import pandas as pd
 import re
+import os
 
 
 class DataManager:
     def __init__(self, path=conf.get_global_conf().params.path_to_data):
+        project_root = Path(__file__).resolve().parent.parent
+        data_dir = project_root / "data"
+
         # self.original_df = pd.read_csv(f'{path}/train.csv')
         self.indexes = None
         # self.test_df = pd.read_csv(f'{path}/test.csv')
-        self.original_df = {"train": pd.read_csv(f'{path}/train.csv'),
-                            "test": pd.read_csv(f'{path}/test.csv')}
+        self.original_df = {"train": pd.read_csv(data_dir / "train.csv"),
+
+                            "test": pd.read_csv(data_dir / "test.csv")}
 
     def preprocess(self, mode_key="train"):
         data = self.original_df[mode_key]
@@ -39,7 +46,7 @@ class DataManager:
             feat_df['Cabin'] = feat_df['Cabin'].apply(
                 lambda x: re.sub(r'^([a-zA-Z]+).*', r'\1', x) if pd.notna(x) else 'Unknown')
 
-            feat_df[(feat_df["Cabin"] == "T") | (feat_df["Cabin"] == "G")]["Cabin"] = "Unknown"
+            feat_df.loc[(feat_df["Cabin"] == "T") | (feat_df["Cabin"] == "G"), "Cabin"] = "Unknown"
             feat_df['FamilySize'] = feat_df['SibSp'] + feat_df['Parch'] + 1
             feat_df = pd.get_dummies(data=feat_df, columns=["Cabin"])
 
@@ -50,3 +57,6 @@ class DataManager:
         print(self.original_df.info())
         print(self.original_df.describe())
         print(self.original_df.isnull().sum(axis=0))
+
+    def fillnas(self, X: pd.DataFrame, y: pd.DataFrame, column):
+        pass

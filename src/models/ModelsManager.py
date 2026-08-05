@@ -2,13 +2,13 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 
 from config import omegaconfig as conf
-import models
+from models.models import get_models
 from omegaconf import OmegaConf
 
 
 class ModelsManager:
     def __init__(self, config_path=None):
-        self.model_reg = models.get_models()
+        self.model_reg = get_models()
         self.param_config = conf.get_param_conf() if config_path is None else OmegaConf.load(config_path)
 
     def iterate_all_models(self):
@@ -17,13 +17,12 @@ class ModelsManager:
             model_name = conf.get_global_conf().params.best_model
             model = self.model_reg[model_name]
 
-            pipeline = Pipeline([
-                ('imputer', SimpleImputer(strategy='median')),
-                ('classifier', model)
-            ])
-            yield from [(pipeline, model_name)]
+            yield from [(model, model_name)]
 
         for model_name, model in self.model_reg.items():
+            if model_name in ["catboost+default"]:
+                yield model, model_name
+
             pipeline = Pipeline([
                 ('imputer', SimpleImputer(strategy='median')),
                 ('classifier', model)

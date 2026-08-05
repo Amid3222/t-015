@@ -16,7 +16,7 @@ class Validater:
         best_score = 0
         best_model = None
 
-        for fold, (train_idx, val_idx) in enumerate(kf.split(X)):
+        for fold, (train_idx, val_idx) in enumerate(kf.split(X, y)):
             X_train, X_val = X.iloc[train_idx], X.iloc[val_idx]
             y_train, y_val = y.iloc[train_idx], y.iloc[val_idx]
 
@@ -36,12 +36,13 @@ class Validater:
         return scores, best_model
 
     def k_fold_catboost(self, dataframe, model_params, model_class, cat_features=None, kf=utils.get_skf()):
+
         X, y = utils.split_data_pd(dataframe, conf.get_global_conf().params.target_column_name)
         scores = []
         best_score = 0
         best_model = None
 
-        for fold, (train_idx, val_idx) in enumerate(kf.split(X)):
+        for fold, (train_idx, val_idx) in enumerate(kf.split(X, y)):
             X_train, X_val = X.iloc[train_idx], X.iloc[val_idx]
             y_train, y_val = y.iloc[train_idx], y.iloc[val_idx]
 
@@ -63,7 +64,6 @@ class Validater:
 
         print(f"\nСредний score: {np.mean(scores):.4f} ± {np.std(scores):.4f}")
         return scores, best_model
-
 
     def test_train_split_val(self, val_data_x, val_data_y, model):
         y_preds = model.predict(val_data_x)

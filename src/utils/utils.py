@@ -10,7 +10,10 @@ def validate(model, X, y):
     return score
 
 
-def save_results_csv(path_f=conf.get_global_conf().save_result_to, **kwargs):
+def save_results_csv(path_f=None, **kwargs):
+    if path_f is None:
+
+        path_f = conf.get_global_conf().params.save_result_to
     print(f"saving... {kwargs}")
     new_data = kwargs
     df_new = pd.DataFrame([new_data])

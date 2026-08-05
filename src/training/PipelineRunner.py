@@ -38,15 +38,15 @@ class PipelineRunner:
 
         print("start k-fold process...")
 
-        for model, model_name in model_manager.iterate_all_models().items():
-
+        for model, model_name in model_manager.iterate_all_models():
+            print(f"validating model {model_name}...")
             if str(model_name).startswith("catboost"):
                 validator.k_fold_catboost(dataframe=data, model_params=model.get_params(deep=True),
                                           model_class=model.__class__)
-                print(f"validating model {model_name} with score {np.mean(scores)}")
 
             scores, best_fold_model = validator.k_fold(dataframe=data, model=model)
-            print(f"validating model {model_name} with score {np.mean(scores)}")
+
+            print(f"model {model_name} score {np.mean(scores)}")
 
             utils.save_results_csv(model=model_name, params=model.get_params(deep=True), cv_median=np.mean(scores),
                                    cv_std=np.std(scores))
