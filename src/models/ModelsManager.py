@@ -18,9 +18,9 @@ class ModelsManager:
             model = self.model_reg[model_name]
 
             yield from [(model, model_name)]
-
-        for model_name, model in self.model_reg.items():
-            yield model, model_name
+        else:
+            for model_name, model in self.model_reg.items():
+                yield model, model_name
 
     def get_model_by_name(self, name: str):
         return self.model_reg[name]

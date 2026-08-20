@@ -1,8 +1,8 @@
 params:
   use_best_model: False # использовать для тренировки лучшую(по экспериментам) модель или перебирать все
-  best_model: "catboost+default"
-  random_state: 42
+  best_model: "xgboost+best"
+  random_state: 12
   path_to_data: "/data"
   target_column_name: "Survived"
   save_result_to: "model_info.csv"
-  feat_ver: 0   #[0, 1] версии датасетов с разными фичами
+  feat_ver: 1   #[0, 1] версии датасетов с разными фичами

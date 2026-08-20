@@ -4,6 +4,7 @@ from config import omegaconfig as conf
 import pandas as pd
 import re
 import os
+import numpy as np
 
 
 class DataManager:
@@ -32,6 +33,7 @@ class DataManager:
         # self.indexes = self.original_df["PassengerId"]
         data = data.drop(columns=["Ticket", "Name", "Embarked", "PassengerId"])
         data = pd.get_dummies(data, columns=['Sex'], drop_first=True)
+        data['Fare_log'] = np.log1p(data['Fare'])
         # self.original_df = self.original_df.Age.fillna(self.original_df.Age.mean())
 
         return data

@@ -30,11 +30,17 @@ def fillnas(X_train: pd.DataFrame, X_val: pd.DataFrame, columns):
 
     return X_val, X_train
 
+def clip(X_train,X_val):
+    fare_upper = X_train['Fare'].quantile(0.95)
+    X_train['Fare'] = X_train['Fare'].clip(upper=fare_upper)
+    X_val['Fare'] = X_val['Fare'].clip(upper=fare_upper)
+
+    return  X_val , X_train
 
 def test_train_split(X, y):
     X_train, X_test, y_train, y_test = train_test_split(
         X, y,
-        test_size=0.2,
+        test_size=0.1,
         random_state=conf.get_global_conf().params.random_state,
         stratify=y
     )

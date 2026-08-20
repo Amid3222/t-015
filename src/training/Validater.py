@@ -23,6 +23,7 @@ class Validater:
             y_val = y.iloc[val_idx].copy()
 
             X_val, X_train = utils.fillnas(X_train, X_val, columns=["Age"])
+            X_val, X_train = utils.clip(X_train, X_val)
 
             f_model = clone(model)
 
@@ -53,7 +54,7 @@ class Validater:
             y_val = y.iloc[val_idx].copy()
 
             X_val, X_train = utils.fillnas(X_train, X_val, columns=["Age"])
-
+            X_val, X_train = utils.clip(X_train, X_val)
             train_pool = Pool(X_train, y_train, cat_features=cat_features)
             val_pool = Pool(X_val, y_val, cat_features=cat_features)
 
@@ -74,6 +75,7 @@ class Validater:
         return scores, best_model
 
     def test_train_split_val(self, val_data_x, val_data_y, model):
+
         y_preds = model.predict(val_data_x)
         return utils.accuracy(y_preds, val_data_y)
 
