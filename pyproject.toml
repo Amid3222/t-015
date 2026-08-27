@@ -1,0 +1,17 @@
+[project]
+name = "titanic-classic-ml"
+version = "0.1.0"
+description = "Classic ML solution for the Kaggle Titanic survival prediction competition"
+requires-python = ">=3.10"
+dependencies = [
+    "pandas",
+    "numpy",
+    "scikit-learn",
+    "catboost",
+    "xgboost",
+    "lightgbm",
+    "omegaconf",
+    "torch",
+    "matplotlib",
+    "joblib",
+]
